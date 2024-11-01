@@ -6,12 +6,11 @@ import {
   updateData,
   removeData,
 } from "../controllers/index.js";
-const router = Router();
+export const userRouter = Router();
 
-router.get("/", getAllData);
-router.get("/search", searchData);
-router.get("/:id", getById);
-router.put("/:id", updateData);
-router.delete("/:id", removeData);
+userRouter.get("/", getAllData);
+userRouter.get("/search", searchData);
+userRouter.get("/:id", getById);
+userRouter.put("/:id", updateData);
+userRouter.delete("/:id", removeData);
 
-export default router;

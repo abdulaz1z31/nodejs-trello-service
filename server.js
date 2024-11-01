@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import routes from "./routes/index.routes.js";
+import {userRouter, authRouter, boardRouter, taskRouter} from "./routes/index.routes.js"
 import { createTables } from "./db/tables.js";
 import { connectDatabase } from "./db/db.js";
 
@@ -14,10 +14,15 @@ app.use("/setUp", (req, res) => {
   createTables();
   res.status(201).send("Tables were created");
 });
-app.use("/api/v1", routes);
+
+app.use("/users", userRouter);
+app.use("/auth", authRouter);
+app.use("/board", boardRouter);
+app.use("/task", taskRouter);
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log("Project is running on port:" + port);
   connectDatabase();
 });
+
