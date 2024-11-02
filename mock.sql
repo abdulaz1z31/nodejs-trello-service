@@ -126,3 +126,8 @@ VALUES
         3,
         9
     );
+
+INSERT INTO
+    tasks (title, orderss, description, userId, boardId, columnId)
+VALUES
+    ('Setup project structure', 1, 'Initialize the project repository and structure.', 1, 1, 1)

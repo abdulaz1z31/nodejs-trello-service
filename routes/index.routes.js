@@ -1,6 +1,8 @@
-export * from "./auth.routes.js";
-export * from "./user.routes.js";
-export * from "./board.routes.js";
-export * from "./task.routes.js";
+import authRouter from "./auth.routes.js";
+import userRouter from "./user.routes.js";
+import boardRouter from "./board.routes.js";
 
+
+
+export {authRouter, userRouter, boardRouter}
 

@@ -1,9 +1,15 @@
 import pool from "../db/db.js";
-import bcrypt from "bcrypt";
 
 export async function getAllTasks(req, res, next) {
   try {
-    const getData = await pool.query("SELECT * FROM tasks");
+    console.log(req.params);
+
+    const boardId = req.params.boardId;
+
+    const getData = await pool.query("SELECT * FROM tasks where boardId = $1", [
+      boardId,
+    ]);
+
     res.status(200).send({
       status: "Success",
       data: getData.rows,
@@ -13,16 +19,26 @@ export async function getAllTasks(req, res, next) {
   }
 }
 
-export async function searchTasks(req, res, next) {
+export async function createTask(req, res, next) {
   try {
-    const { q } = req.query;
-    const searchData = await pool.query(
-      "SELECT * FROM tasks WHERE title ILIKE '%$1%'",
-      [q]
+    const data = req.body;
+    const boardId = req.params.boardId;
+    const { title, order, description, userId, columnId } = req.body;
+    if (!title || !order || !description || !userId || !columnId) {
+      return res.status(400).send("Enter all informations");
+    }
+
+    const wdate = await pool.query(
+      `INSERT INTO
+    tasks (title, orderss, description, userId, boardId, columnId)
+VALUES
+    ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [title, order, description, userId, boardId, columnId]
     );
+
     res.status(200).send({
-      status: "Success",
-      data: searchData.rows,
+      status: "created",
+      id: wdate.rows[0],
     });
   } catch (error) {
     next(error);
@@ -32,7 +48,14 @@ export async function searchTasks(req, res, next) {
 export async function getTasksById(req, res, next) {
   try {
     const id = req.params.id;
-    const data = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
+
+    const boardId = req.params.boardId;
+
+    const data = await pool.query(
+      "SELECT * FROM tasks WHERE id=$1 and boardid = $2",
+      [id, boardId]
+    );
+
     res.status(200).send({
       status: "Success",
       data: data.rows[0],
@@ -46,8 +69,11 @@ export async function updateTasks(req, res, next) {
   try {
     const id = req.params.id;
     const { title, order, description, userId, boardId, columnId } = req.body;
-
-    const data = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
+    const boardD = req.params.boardId;
+    const data = await pool.query(
+      "SELECT * FROM tasks WHERE id=$1 and boardId = $2",
+      [id, boardD]
+    );
     if (!data.rows.length) {
       return res.status(404).send("Task was not found!");
     }
@@ -61,8 +87,8 @@ export async function updateTasks(req, res, next) {
         description || oldUser.description,
         userId || oldUser.userId,
         boardId || oldUser.boardId,
-        columnId|| oldUser.columnId,
-        id
+        columnId || oldUser.columnId,
+        id,
       ]
     );
 
@@ -81,7 +107,11 @@ export async function updateTasks(req, res, next) {
 export async function removeTasks(req, res, next) {
   try {
     const id = req.params.id;
-    const oldData = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
+    const boardId = req.params.boardId;
+    const oldData = await pool.query(
+      "SELECT * FROM tasks WHERE id=$1 and boardId = $2",
+      [id, boardId]
+    );
 
     if (!oldData.rows.length) {
       return res.status(404).send("Task was not found!");
