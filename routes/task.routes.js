@@ -1,16 +1,16 @@
 import { Router } from "express";
 import {
-    getAllData,
-    searchData,
-    getById,
-    updateData,
-    removeData,
+    getAllTasks,
+    searchTasks,
+    updateTasks,
+    removeTasks,
+    getTasksById,
   } from "../controllers/index.js";
 export const taskRouter = Router();
 
-taskRouter.get("/", getAllData);
-taskRouter.get("/search", searchData);
-taskRouter.get("/:id", getById);
-taskRouter.put("/:id", updateData);
-taskRouter.delete("/:id", removeData);
+taskRouter.get("/", getAllTasks);
+taskRouter.get("/search", searchTasks);
+taskRouter.get("/:id", getTasksById);
+taskRouter.put("/:id", updateTasks);
+taskRouter.delete("/:id", removeTasks);
 

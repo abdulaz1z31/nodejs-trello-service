@@ -1,17 +1,17 @@
 import { Router } from "express";
 import {
-    getAllData,
-    searchData,
-    getById,
-    updateData,
-    removeData,
+    getAllBoards,
+    searchBoards,
+    getBoardsById,
+    updateBoards,
+    removeBoards,
   } from "../controllers/index.js";
 export const boardRouter = Router();
 
-boardRouter.get("/", getAllData);
-boardRouter.get("/search", searchData);
-boardRouter.get("/:id", getById);
-boardRouter.put("/:id", updateData);
-boardRouter.delete("/:id", removeData);
+boardRouter.get("/", getAllBoards);
+boardRouter.get("/search", searchBoards);
+boardRouter.get("/:id", getBoardsById);
+boardRouter.put("/:id", updateBoards);
+boardRouter.delete("/:id", removeBoards);
 
 

@@ -11,7 +11,7 @@ export const createTables = async () => {
         createdAt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
         updatedAt TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
       )`,
-      `CREATE TABLE IF NOT EXISTS board (
+      `CREATE TABLE IF NOT EXISTS boards (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         columns INT NOT NULL
@@ -19,15 +19,15 @@ export const createTables = async () => {
       `CREATE TABLE IF NOT EXISTS board_columns (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
-        boardId INT REFERENCES board(id) ON DELETE CASCADE
+        boardId INT REFERENCES boards(id) ON DELETE CASCADE
       )`,
-      `CREATE TABLE IF NOT EXISTS task (
+      `CREATE TABLE IF NOT EXISTS tasks (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
-        "order" INT NOT NULL,
+        orderss INT NOT NULL,
         description TEXT,
         userId INT REFERENCES users(id) ON DELETE SET NULL,
-        boardId INT REFERENCES board(id) ON DELETE CASCADE,
+        boardId INT REFERENCES boards(id) ON DELETE CASCADE,
         columnId INT REFERENCES board_columns(id)
       )`,
     ];

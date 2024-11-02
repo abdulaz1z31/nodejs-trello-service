@@ -1,9 +1,9 @@
 import pool from "../db/db.js";
 import bcrypt from "bcrypt";
 
-export async function getAllData(req, res, next) {
+export async function getAllBoards(req, res, next) {
   try {
-    const getData = await pool.query("SELECT * FROM users");
+    const getData = await pool.query("SELECT * FROM boards");
     res.status(200).send({
       status: "Success",
       data: getData.rows,
@@ -13,11 +13,11 @@ export async function getAllData(req, res, next) {
   }
 }
 
-export async function searchData(req, res, next) {
+export async function searchBoards(req, res, next) {
   try {
     const { q } = req.query;
     const searchData = await pool.query(
-      "SELECT * FROM users WHERE name ILIKE '%$1%'",
+      "SELECT * FROM users WHERE title ILIKE '%$1%'",
       [q]
     );
     res.status(200).send({
@@ -29,10 +29,10 @@ export async function searchData(req, res, next) {
   }
 }
 
-export async function getById(req, res, next) {
+export async function getBoardsById(req, res, next) {
   try {
     const id = req.params.id;
-    const data = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const data = await pool.query("SELECT * FROM boards WHERE id=$1", [id]);
     res.status(200).send({
       status: "Success",
       data: data.rows[0],
@@ -42,33 +42,23 @@ export async function getById(req, res, next) {
   }
 }
 
-export async function updateData(req, res, next) {
+export async function updateBoards(req, res, next) {
   try {
     const id = req.params.id;
-    const { name, email, password } = req.body;
+    const { title, columns} = req.body;
 
-    const data = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const data = await pool.query("SELECT * FROM boards WHERE id=$1", [id]);
     if (!data.rows.length) {
-      return res.status(404).send("User was not found!");
+      return res.status(404).send("Board was not found!");
     }
     let oldUser = data.rows[0];
 
-    let hashPassword;
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      hashPassword = await bcrypt.hash(password, salt);
-    }
-
-    console.log(name, email, password, hashPassword);
-
     const editData = await pool.query(
-      "UPDATE users SET name=$1, email=$2, password=$3, updatedAt=$4 WHERE id=$5 RETURNING id",
+      "UPDATE boards SET title=$1, columns=$2 RETURNING id",
       [
-        name || oldUser.name,
-        email || oldUser.email,
-        hashPassword || oldUser.password,
-        new Date(),
-        id,
+        title || oldUser.title,
+        columns || oldUser.columns,
+        id
       ]
     );
 
@@ -84,17 +74,17 @@ export async function updateData(req, res, next) {
   }
 }
 
-export async function removeData(req, res, next) {
+export async function removeBoards(req, res, next) {
   try {
     const id = req.params.id;
-    const oldData = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const oldData = await pool.query("SELECT * FROM boards WHERE id=$1", [id]);
 
     if (!oldData.rows.length) {
-      return res.status(404).send("User was not found!");
+      return res.status(404).send("Board was not found!");
     }
 
     const data = await pool.query(
-      "DELETE FROM users WHERE id=$1 RETURNING id",
+      "DELETE FROM boards WHERE id=$1 RETURNING id",
       [id]
     );
 

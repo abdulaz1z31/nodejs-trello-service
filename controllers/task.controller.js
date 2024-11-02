@@ -1,9 +1,9 @@
 import pool from "../db/db.js";
 import bcrypt from "bcrypt";
 
-export async function getAllData(req, res, next) {
+export async function getAllTasks(req, res, next) {
   try {
-    const getData = await pool.query("SELECT * FROM users");
+    const getData = await pool.query("SELECT * FROM tasks");
     res.status(200).send({
       status: "Success",
       data: getData.rows,
@@ -13,11 +13,11 @@ export async function getAllData(req, res, next) {
   }
 }
 
-export async function searchData(req, res, next) {
+export async function searchTasks(req, res, next) {
   try {
     const { q } = req.query;
     const searchData = await pool.query(
-      "SELECT * FROM users WHERE name ILIKE '%$1%'",
+      "SELECT * FROM tasks WHERE title ILIKE '%$1%'",
       [q]
     );
     res.status(200).send({
@@ -29,10 +29,10 @@ export async function searchData(req, res, next) {
   }
 }
 
-export async function getById(req, res, next) {
+export async function getTasksById(req, res, next) {
   try {
     const id = req.params.id;
-    const data = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const data = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
     res.status(200).send({
       status: "Success",
       data: data.rows[0],
@@ -42,33 +42,27 @@ export async function getById(req, res, next) {
   }
 }
 
-export async function updateData(req, res, next) {
+export async function updateTasks(req, res, next) {
   try {
     const id = req.params.id;
-    const { name, email, password } = req.body;
+    const { title, order, description, userId, boardId, columnId } = req.body;
 
-    const data = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const data = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
     if (!data.rows.length) {
-      return res.status(404).send("User was not found!");
+      return res.status(404).send("Task was not found!");
     }
     let oldUser = data.rows[0];
 
-    let hashPassword;
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      hashPassword = await bcrypt.hash(password, salt);
-    }
-
-    console.log(name, email, password, hashPassword);
-
     const editData = await pool.query(
-      "UPDATE users SET name=$1, email=$2, password=$3, updatedAt=$4 WHERE id=$5 RETURNING id",
+      "UPDATE boards SET title=$1, order=$2, description=$3, userId=$4, boardId=$5, columnId=$6 WHERE id=$7 RETURNING id",
       [
-        name || oldUser.name,
-        email || oldUser.email,
-        hashPassword || oldUser.password,
-        new Date(),
-        id,
+        title || oldUser.title,
+        order || oldUser.order,
+        description || oldUser.description,
+        userId || oldUser.userId,
+        boardId || oldUser.boardId,
+        columnId|| oldUser.columnId,
+        id
       ]
     );
 
@@ -84,17 +78,17 @@ export async function updateData(req, res, next) {
   }
 }
 
-export async function removeData(req, res, next) {
+export async function removeTasks(req, res, next) {
   try {
     const id = req.params.id;
-    const oldData = await pool.query("SELECT * FROM users WHERE id=$1", [id]);
+    const oldData = await pool.query("SELECT * FROM tasks WHERE id=$1", [id]);
 
     if (!oldData.rows.length) {
-      return res.status(404).send("User was not found!");
+      return res.status(404).send("Task was not found!");
     }
 
     const data = await pool.query(
-      "DELETE FROM users WHERE id=$1 RETURNING id",
+      "DELETE FROM tasks WHERE id=$1 RETURNING id",
       [id]
     );
 
